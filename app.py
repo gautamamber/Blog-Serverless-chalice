@@ -17,15 +17,16 @@ def index():
 @app.route('/auth/signup', methods = ['POST'])
 def signup():
     request = app.current_request
+    body = request.json_body
     if request.method == "POST":
         cognito.sign_up(
             ClientId = Constants.COGNITO_CLIENT,
-            Username = "ambergautam1@gmail.com",
-            Password = "Test@12345",
+            Username = body['Username'],
+            Password = body['Password'],
             UserAttributes = [
                 {
                 "Name": "name",
-                "Value": "Amber gautam"
+                "Value": body['name']
                 }
             ]
         )
@@ -38,12 +39,13 @@ def signup():
 @app.route('/auth/login', methods = ['POST'])
 def login():
     request = app.current_request
+    body = request.json_body
     if request.method == "POST":
         response = cognito.initiate_auth(
             AuthFlow = "USER_PASSWORD_AUTH",
             AuthParameters = {
-                "USERNAME": "ambergautam1@gmail.com",
-                "PASSWORD": "Test@12345"
+                "USERNAME": body['USERNAME'],
+                "PASSWORD": body['PASSWORD']
             },
             ClientId = Constants.COGNITO_CLIENT
         )
@@ -58,11 +60,12 @@ def login():
 @app.route('/auth/change-password', methods = ['POST'])
 def change_password():
     request = app.current_request
+    body = request.json_body
     if request.method == "POST":
         cognito.change_password(
-            PreviousPassword = "Test@12345",
-            ProposedPassword = "Test@123456",
-            AccessToken = Constants.ACCESS_TOKEN
+            PreviousPassword = body['previous_password'],
+            ProposedPassword = body['proposed_password'],
+            AccessToken = body['access_token']
 
         )
     data = {

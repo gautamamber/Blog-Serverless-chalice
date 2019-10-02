@@ -149,6 +149,24 @@ def add_new():
             "result": Constants.SUCCESS
         }
     return data
+
+# Get complete list of all records
+@app.route("/blog/list", methods = ['GET'])
+def get_list():
+    request = app.current_request
+    token = request.headers['authorization']
+    token_data = token_verification(token)
+    if token_data == False:
+        data = {
+            "result": Constants.NOT_AUTHORIZE
+        }
+    else:
+        response = blog_table.scan()
+        data = {
+                "result": response['Items']
+        }
+    return data
+
         
 
 

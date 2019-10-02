@@ -4,12 +4,21 @@ from constant import Constants
 
 app = Chalice(app_name='blog')
 cognito = boto3.client("cognito-idp")
+dynamo = boto3.resource("dynamodb")
+user_table = dynamo.Table(Constants.USER_TABLE)
 
+def add_user(body):
+    user_table.put_item(
+        Item = body
+    )
 
 # Hello world
 @app.route('/')
 def index():
     return {'hello': 'world'}
+
+
+# DynamoDB User table, put user data
 
 # Cognito authentication
 # Signup
@@ -19,17 +28,27 @@ def signup():
     request = app.current_request
     body = request.json_body
     if request.method == "POST":
-        cognito.sign_up(
+        response = cognito.sign_up(
             ClientId = Constants.COGNITO_CLIENT,
-            Username = body['Username'],
-            Password = body['Password'],
+            Username = body['username'],
+            Password = body['password'],
             UserAttributes = [
                 {
                 "Name": "name",
                 "Value": body['name']
                 }
             ]
-        )
+            )
+        add_to_user = {
+            "username" : response['UserSub'],
+            "name": body['name'],
+            "email": body['username'],
+            "age": body['age'],
+            "contact": body['contact'],
+            "city": body['city']
+        }
+
+        add_user(add_to_user)
         data = {
             "result": Constants.SUCCESS
         }

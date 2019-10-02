@@ -8,3 +8,4 @@ class Constants:
     COGNITO_POOL_ID = "us-west-2_fDCGqkiEO"
     COGNITO_CLIENT = "61nljucf3u59bockhrefnuqbgj"
     SUCCESS = "Success"
+    USER_TABLE = "usertable"

@@ -1,16 +1,28 @@
 from chalice import Chalice
 import boto3
 from constant import Constants
+from decode_verify_jwt import token_verification
+import uuid
+from datetime import datetime
 
 app = Chalice(app_name='blog')
 cognito = boto3.client("cognito-idp")
 dynamo = boto3.resource("dynamodb")
 user_table = dynamo.Table(Constants.USER_TABLE)
+blog_table = dynamo.Table(Constants.BLOG_TABLE)
 
 def add_user(body):
     user_table.put_item(
         Item = body
     )
+
+def get_user_profile(username):
+    response = user_table.get_item(
+            Key = {
+                "username": username
+            }
+        )
+    return response
 
 # Hello world
 @app.route('/')
@@ -96,14 +108,47 @@ def change_password():
 def get_user(username):
     request = app.current_request
     if request.method == "GET":
-        response = user_table.get_item(
-            Key = {
-                "username": username
-            }
-        )
+        response = get_user_profile(username)
         del response['ResponseMetadata']
         data = {
                 "result": response
             }
         return data
+    
+# Blogs
+# add new blog by user authentication
+
+@app.route("/blog/add-new", methods = ['POST'])
+def add_new():
+    request = app.current_request
+    body = request.json_body
+    token = request.headers['authorization']
+    token_data = token_verification(token)
+    if token_data == False:
+        data = {
+            "result": Constants.NOT_AUTHORIZE
+        }
+    else:
+        username = token_data['cognito:username']
+        profile = get_user_profile(username)
+        username = profile['Item']['username']
+        name = profile['Item']['name']
+        timestamp = datetime.now().timestamp()
+        created_date = datetime.utcfromtimestamp(timestamp).strftime('%Y-%m-%d %H:%S')
+        blog_table.put_item(
+            Item = {
+                "blogId": str(uuid.uuid4()),
+                "userId": username,
+                "name": name,
+                "title": body['title'],
+                "description": body['description'],
+                "created_at": created_date
+            }
+        )
+        data = {
+            "result": Constants.SUCCESS
+        }
+    return data
+        
+
 

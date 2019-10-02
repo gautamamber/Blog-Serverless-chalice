@@ -9,3 +9,5 @@ class Constants:
     COGNITO_CLIENT = "61nljucf3u59bockhrefnuqbgj"
     SUCCESS = "Success"
     USER_TABLE = "usertable"
+    BLOG_TABLE = "blogtable"
+    NOT_AUTHORIZE = "User is not Authorize"

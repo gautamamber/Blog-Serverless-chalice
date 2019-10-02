@@ -4,6 +4,7 @@ from constant import Constants
 from decode_verify_jwt import token_verification
 import uuid
 from datetime import datetime
+from boto3.dynamodb.conditions import Key, Attr
 
 app = Chalice(app_name='blog')
 cognito = boto3.client("cognito-idp")
@@ -131,7 +132,6 @@ def add_new():
     else:
         username = token_data['cognito:username']
         profile = get_user_profile(username)
-        username = profile['Item']['username']
         name = profile['Item']['name']
         timestamp = datetime.now().timestamp()
         created_date = datetime.utcfromtimestamp(timestamp).strftime('%Y-%m-%d %H:%S')
@@ -167,6 +167,26 @@ def get_list():
         }
     return data
 
+# Get only user blogs
+@app.route("/blog/user-all-blog/{blog_id}", methods = ['GET'])
+def get_user_blogs(blog_id):
+    request = app.current_request
+    token = request.headers['authorization']
+    token_data = token_verification(token)
+    if token_data == False:
+        data = {
+            "result": Constants.NOT_AUTHORIZE
+        }
+    else:
+        username = token_data['cognito:username']
+        response = blog_table.query(
+            KeyConditionExpression=Key('blogId').eq(blog_id) & Key('userId').eq(username)
+        )
+        
+        data = {
+                "result": response['Items']
+        }
+    return data
         
 
 

@@ -92,3 +92,18 @@ def change_password():
     }
     return data
 
+@app.route("/profile/get-user/{username}", methods = ['GET'])
+def get_user(username):
+    request = app.current_request
+    if request.method == "GET":
+        response = user_table.get_item(
+            Key = {
+                "username": username
+            }
+        )
+        del response['ResponseMetadata']
+        data = {
+                "result": response
+            }
+        return data
+

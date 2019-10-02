@@ -5,8 +5,8 @@ class Constants:
         DynamoTable name
         Messages
     """
-    COGNITO_POOL_ID = "us-west-2_fDCGqkiEO"
-    COGNITO_CLIENT = "61nljucf3u59bockhrefnuqbgj"
+    COGNITO_POOL_ID = "------"
+    COGNITO_CLIENT = "-----"
     SUCCESS = "Success"
     USER_TABLE = "usertable"
     BLOG_TABLE = "blogtable"

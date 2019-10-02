@@ -53,4 +53,20 @@ def login():
             "result": response
         }
         return data
+    
+# Change Password
+@app.route('/auth/change-password', methods = ['POST'])
+def change_password():
+    request = app.current_request
+    if request.method == "POST":
+        cognito.change_password(
+            PreviousPassword = "Test@12345",
+            ProposedPassword = "Test@123456",
+            AccessToken = Constants.ACCESS_TOKEN
+
+        )
+    data = {
+        "result" : Constants.SUCCESS
+    }
+    return data
 

@@ -18,7 +18,7 @@ def index():
 def signup():
     request = app.current_request
     if request.method == "POST":
-        response = cognito.sign_up(
+        cognito.sign_up(
             ClientId = Constants.COGNITO_CLIENT,
             Username = "ambergautam1@gmail.com",
             Password = "Test@12345",
@@ -33,3 +33,24 @@ def signup():
             "result": Constants.SUCCESS
         }
     return data
+
+# Login 
+@app.route('/auth/login', methods = ['POST'])
+def login():
+    request = app.current_request
+    if request.method == "POST":
+        response = cognito.initiate_auth(
+            AuthFlow = "USER_PASSWORD_AUTH",
+            AuthParameters = {
+                "USERNAME": "ambergautam1@gmail.com",
+                "PASSWORD": "Test@12345"
+            },
+            ClientId = Constants.COGNITO_CLIENT
+        )
+        del response['ResponseMetadata']
+        del response['ChallengeParameters']
+        data = {
+            "result": response
+        }
+        return data
+
